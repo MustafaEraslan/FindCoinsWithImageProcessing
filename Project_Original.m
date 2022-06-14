@@ -1,5 +1,6 @@
 % Programı her çalıştırdığımızda farklı datalar ile karşılaşacağımız için
 % workspace'i run etmeden önce temizlememiz gerekir.
+
 clear all
 close all
 
@@ -9,7 +10,9 @@ figure(1),imshow(imageorj);
 
 % rgb2gray ile siyah beyaza dönüştürüp 2 boyuta dönüştürüyoruz. Renk
 % önemsiz.image=rgb2gray(imageorj); 
-level=graythresh(image); %2 boyuta geçirirken matlab'ın kullanıdğı level degeri onemli.
+image=rgb2gray(imageorj); 
+level=graythresh(image);
+%2 boyuta geçirirken matlab'ın kullanıdğı level degeri onemli.
 %Burada o degeri almaktayız. Ben run ettiğimde 0.2784 değerini buldum.
 %0.2784 değeri üstü 1 olarak yani beyaz, alt değeri siyah olarak atandı.
 bw=im2bw(image,level);
@@ -34,13 +37,16 @@ figure(4),imshow(bw);
 %Resimde herhangi bir birleşik madeni para oluşmuşsa, onu ayırdık.
 %imdilate: açma işlemini yapar.
 %imerode: aşındırma işlemi yapar.bw2=imerode(bw,se); 
+se=strel('disk',12,0); 
+
+%If any united coins occurred in the image, we have seperated it.
+bw2=imerode(bw,se); 
 figure(5),imshow(bw2);
 
 % Madeni para uzunluklarını belirlendi ve bu değer B uzunluğuna atandı.
-[B,L] = bwboundaries(bw2);
+[B,L] = bwboundaries(bw2);  
 %B = bwboundaries(BW), ikili görüntü BW'de nesnelerin dış sınırlarını ve bu nesnelerin içindeki deliklerin sınırlarını izler. bwboundaries ayrıca en dıştaki nesnelere izler ve onları takip sürer. Sınır piksel konumlarının bir hücre dizisi olan B'yi döndürür.
 stats = regionprops(bw2, 'Area','Centroid');
-%ikili görüntüdeki BW'deki her 8 bağlantılı nesne için bir dizi özellik için ölçümleri döndürür.
 figure(6),imshow(imageorj);    
 total = 0;  %baslangic degerleri atandi. Tum paralar ıcın
 count1=0;   %1 tlyi say
@@ -49,8 +55,7 @@ count25=0;  %25kr say
 count10=0;  %1 tl'yi say
 count5=0;   %5kr say
 for n=1:length(B) 
-  %Para alanları bulundu ve fotoğraftaki ile eşlenip eşlenmediğini sorgulamak için bir loop etrafında incelendi.       
-  
+  %Para alanları bulundu ve fotoğraftaki ile eşlenip eşlenmediğini sorgulamak için bir loop etrafında incelendi.   
   a=stats(n).Area;        
   centroid=stats(n).Centroid;            
   if a> 8000                 
